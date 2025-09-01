@@ -398,7 +398,7 @@ class IntegrationApi
         if ($token) {
             $data['token'] = $token;
         }
-// $data['token'] = '123';
+
         $data['hash'] = $this->generateHash($data);
 
         return $this->call('game/url', $data);
@@ -436,7 +436,7 @@ class IntegrationApi
         $this->error = curl_error($ch);
 
         curl_close($ch);
-dd($this->result, $this->http_code, $this->error);
+
         return json_decode($this->result, true);
     }
 }
