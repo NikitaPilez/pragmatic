@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+
+  mysql:
+    image: mysql:5.7
+    container_name: pragmatic_mysql
+    environment:
+      MYSQL_DATABASE: laravel
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3307:3306"
+#    networks:
+#      - customer-service
+
+  web:
+    container_name: pragmatic_web
+    image: nginx:latest
+    depends_on:
+      - mysql
+    links:
+      - mysql
+    ports:
+      - '8101:80'
+    volumes:
+      - ./:/code
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+
+  php:
+    container_name: pragmatic_php
+    build:
+      context: ./docker/php
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - .:/code
+    working_dir: /code
+#    ports:
+#      - "9000:9000"
+    depends_on:
+      - mysql
+#    command: php-fpm
+#    networks:
+#      - customer-service
+
+#networks:
+#  customer-service:
+#    driver: bridge
