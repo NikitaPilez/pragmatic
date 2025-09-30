@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+
+  php:
+    container_name: pragmatic_php
+    build:
+      context: ./docker/php
+    volumes:
+      - .:/code
+    working_dir: /code
+    restart: unless-stopped
