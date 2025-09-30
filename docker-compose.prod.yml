@@ -7,6 +7,8 @@ services:
     build:
       context: ./docker/php
     volumes:
-      - .:/code
-    working_dir: /code
+      - .:/var/www/html
+    working_dir: /var/www/html
     restart: unless-stopped
+    ports:
+      - '9000:9000'
