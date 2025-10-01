@@ -1,6 +1,6 @@
 <?php
 
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,6 +13,10 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
+Route::get('casino-games', 'PragmaticController@casinoGames');
+Route::get('lobby-games', 'PragmaticController@lobbyGames');
+Route::get('close-session', 'PragmaticController@closeSession');
+Route::get('cancel-round', 'PragmaticController@cancelRound');
+Route::get('health-check', 'PragmaticController@healthCheck');
+Route::get('replay-link', 'PragmaticController@replayLink');
+Route::get('game-url', 'PragmaticController@gameUrl');

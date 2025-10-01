@@ -34,7 +34,7 @@ class IntegrationApi
      * FilterStudio=<studio_name>, for example FilterStudio=PP - for Pragmatic Play games
      * FilterStudio=FP - for Fat Panda games
      */
-    public function getCasinoGames(array $options = [])
+    public function getCasinoGames(array $options = []): array
     {
         $data = [
             'secureLogin' => $this->secureLogin,
@@ -60,7 +60,7 @@ class IntegrationApi
      * @param string $country
      * ISO Country code. Possibility to get games available (not blocked) for the specific country.
      */
-    public function getLobbyGames(string $categories = 'all', string $country = '')
+    public function getLobbyGames(string $categories = 'all', string $country = ''): array
     {
         $data = [
             'secureLogin' => $this->secureLogin,
@@ -90,7 +90,7 @@ class IntegrationApi
      * 1 – history should be removed, so that the last game round cannot be completed anymore
      * 0 – last game round can be completed
      */
-    public function closeSession(string $externalPlayerId, string $gameId = '', int $clearHistory = 0)
+    public function closeSession(string $externalPlayerId, string $gameId = '', int $clearHistory = 0): array
     {
         $data = [
             'secureLogin' => $this->secureLogin,
@@ -114,7 +114,7 @@ class IntegrationApi
      * @param string $gameId id of the game. This is required parameter.
      * @param int $roundId id of the game round to be canceled (play session id).
      */
-    public function cancelRound(string $externalPlayerId, string $gameId, int $roundId)
+    public function cancelRound(string $externalPlayerId, string $gameId, int $roundId): array
     {
         $data = [
             'secureLogin' => $this->secureLogin,
@@ -134,7 +134,7 @@ class IntegrationApi
      * @param bool $isApiService if true - check API service health check
      * If false - check game server health check
      */
-    public function healthCheck(bool $isApiService)
+    public function healthCheck(bool $isApiService): array
     {
         if ($isApiService) {
             $url = self::BASE_URL . 'health/heartbeatCheck';
@@ -158,7 +158,11 @@ class IntegrationApi
 
         curl_close($ch);
 
-        return json_decode($this->result, true);
+        return [
+            'result' => json_decode($this->result, true),
+            'http_code' => $this->http_code,
+            'error' => $this->error,
+        ];
     }
 
     /**
@@ -316,7 +320,7 @@ class IntegrationApi
         ?string $operatorGameHistoryUrl = null,
         ?string $lobbyFilter = null,
         ?string $lobbyCategory = null,
-        ?string $token = null)
+        ?string $token = null): array
     {
         $data = [
             'secureLogin' => $this->secureLogin,
@@ -413,7 +417,7 @@ class IntegrationApi
         return md5($plain . $this->secretKey);
     }
 
-    public function call($method, $params = [])
+    public function call($method, $params = []): array
     {
         $ch = curl_init();
 
@@ -437,6 +441,10 @@ class IntegrationApi
 
         curl_close($ch);
 
-        return json_decode($this->result, true);
+        return [
+            'result' => json_decode($this->result, true),
+            'http_code' => $this->http_code,
+            'error' => $this->error,
+        ];
     }
 }
