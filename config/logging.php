@@ -76,6 +76,11 @@ return [
             'driver' => 'errorlog',
             'level' => 'debug',
         ],
+
+        'pragmatic' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/pragmatic.log'),
+        ],
     ],
 
 ];
