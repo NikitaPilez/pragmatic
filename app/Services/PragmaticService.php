@@ -2,8 +2,11 @@
 
 namespace App\Services;
 
-use App\Http\Player;
+use App\Player;
+use App\Transaction;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
+use Throwable;
 
 class PragmaticService implements PragmaticServiceInterface
 {
@@ -36,19 +39,69 @@ class PragmaticService implements PragmaticServiceInterface
         return Player::query()->where('user_id', $userId)->first();
     }
 
-    public function processedBet(Player $player, float $amount): Player
+    public function processedBet(Player $player, array $data): ?Transaction
     {
-        $player->balance -= $amount;
-        $player->save();
+        $amount = $data['amount'];
+        $idempotencyKey = $data['reference'];
 
-        return $player;
+        $transaction = Transaction::where('player_id', $player->id)->where('idempotency_key', $idempotencyKey)->first();
+
+        if (! $transaction) {
+            try {
+                DB::beginTransaction();
+
+                $transaction = new Transaction;
+                $transaction->player_id = $player->id;
+                $transaction->amount = -$amount;
+                $transaction->idempotency_key = $idempotencyKey;
+                $transaction->save();
+
+                $player->balance -= $amount;
+                $player->save();
+
+                DB::commit();
+
+                return $transaction;
+            } catch (Throwable $e) {
+                DB::rollBack();
+
+                return null;
+            }
+        }
+
+        return $transaction;
     }
 
-    public function processedWinBet(Player $player, float $amount): Player
+    public function processedWinBet(Player $player, array $data): ?Transaction
     {
-        $player->balance += $amount;
-        $player->save();
+        $amount = $data['amount'];
+        $idempotencyKey = $data['reference'];
 
-        return $player;
+        $transaction = Transaction::where('player_id', $player->id)->where('idempotency_key', $idempotencyKey)->first();
+
+        if (! $transaction) {
+            try {
+                DB::beginTransaction();
+
+                $transaction = new Transaction;
+                $transaction->player_id = $player->id;
+                $transaction->amount = $amount;
+                $transaction->idempotency_key = $idempotencyKey;
+                $transaction->save();
+
+                $player->balance += $amount;
+                $player->save();
+
+                DB::commit();
+
+                return $transaction;
+            } catch (Throwable $e) {
+                DB::rollBack();
+
+                return null;
+            }
+        }
+
+        return $transaction;
     }
 }

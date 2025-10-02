@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Http;
+namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @property-read int $id
@@ -14,5 +15,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Player extends Model
 {
-
+    public function transactions(): HasMany
+    {
+        return $this->hasMany(Transaction::class);
+    }
 }

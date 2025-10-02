@@ -171,7 +171,7 @@ class IntegrationApi
      * @param string $externalPlayerId id of the player within the operator system.
      * @param int $roundId unique identifier of the game round.
      */
-    public function getReplayLink(string $externalPlayerId, int $roundId)
+    public function getReplayLink(string $externalPlayerId, int $roundId): array
     {
         $data = [
             'secureLogin' => $this->secureLogin,

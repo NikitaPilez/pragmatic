@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Player;
 use App\Http\Requests\AuthenticateRequest;
 use App\Http\Requests\BetRequest;
 use App\Http\Requests\GetBalanceRequest;
 use App\Http\Requests\ResultRequest;
+use App\Player;
 use App\Services\PragmaticErrorCodesService;
 use App\Services\PragmaticServiceInterface;
 use Illuminate\Http\JsonResponse;
@@ -112,10 +112,17 @@ class PragmaticWalletController extends Controller
             ]);
         }
 
-        $player = $this->pragmaticServiceInterface->processedBet($player, $request->input('amount'));
+        $transaction = $this->pragmaticServiceInterface->processedBet($player, $request->all());
+
+        if (! $transaction) {
+            return response()->json([
+                'error' => PragmaticErrorCodesService::getInternalServerErrorRetryCode(),
+                'description' => 'Server error',
+            ]);
+        }
 
         return $this->successResponse([
-            'transactionId' => rand(10000, 10000000),
+            'transactionId' => $transaction->id,
             'currency' => $player->currency,
             'cash' => $player->balance,
             'bonus' => $player->bonus,
@@ -146,10 +153,17 @@ class PragmaticWalletController extends Controller
             ]);
         }
 
-        $player = $this->pragmaticServiceInterface->processedWinBet($player, $request->input('amount'));
+        $transaction = $this->pragmaticServiceInterface->processedWinBet($player, $request->all());
+
+        if (! $transaction) {
+            return response()->json([
+                'error' => PragmaticErrorCodesService::getInternalServerErrorRetryCode(),
+                'description' => 'Server error',
+            ]);
+        }
 
         return $this->successResponse([
-            'transactionId' => rand(10000, 10000000),
+            'transactionId' => $transaction->id,
             'currency' => $player->currency,
             'cash' => $player->balance,
             'bonus' => $player->bonus,

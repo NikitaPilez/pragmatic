@@ -2,7 +2,8 @@
 
 namespace App\Services;
 
-use App\Http\Player;
+use App\Player;
+use App\Transaction;
 use Illuminate\Database\Eloquent\Model;
 
 interface PragmaticServiceInterface
@@ -11,6 +12,6 @@ interface PragmaticServiceInterface
     public function getPlayerByToken(string $token): ?Model;
     public function getPlayerByUserId(string $userId): ?Model;
 
-    public function processedBet(Player $player, float $amount): Player;
-    public function processedWinBet(Player $player, float $amount): Player;
+    public function processedBet(Player $player, array $data): ?Transaction;
+    public function processedWinBet(Player $player, array $data): ?Transaction;
 }
