@@ -412,7 +412,7 @@ class IntegrationApi
             $player->user_id = $externalPlayerId;
             $player->balance = 1000;
             $player->bonus = 100;
-            $player->currency = $currency;
+            $player->currency = $currency ?: 'USD';
             $player->token = $token;
             $player->is_banned = false;
             $player->save();
