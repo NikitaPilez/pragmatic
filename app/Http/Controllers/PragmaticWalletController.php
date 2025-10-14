@@ -10,6 +10,7 @@ use App\Player;
 use App\Services\PragmaticErrorCodesService;
 use App\Services\PragmaticServiceInterface;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class PragmaticWalletController extends Controller
 {
@@ -168,6 +169,227 @@ class PragmaticWalletController extends Controller
             'cash' => $player->balance,
             'bonus' => $player->bonus,
         ]);
+    }
+
+    public function bonusWin(Request $request): JsonResponse
+    {
+        logger()->channel('pragmatic')->info('Bonus Win', $request->all());
+
+        /** @var Player $player */
+        $player = $this->pragmaticServiceInterface->getPlayerByUserId($request->input('userId'));
+
+        if (! $player) {
+            return response()->json([
+                'error' => PragmaticErrorCodesService::getPlayerNotFoundCode(),
+                'description' => 'Player not found',
+            ]);
+        }
+
+        $transaction = $this->pragmaticServiceInterface->processedBonusWin($player, $request->all());
+
+        if (! $transaction) {
+            return response()->json([
+                'error' => PragmaticErrorCodesService::getInternalServerErrorRetryCode(),
+                'description' => 'Server error',
+            ]);
+        }
+
+        return $this->successResponse([
+            'transactionId' => $transaction->id,
+            'currency' => $player->currency,
+            'cash' => $player->balance,
+            'bonus' => $player->bonus,
+        ]);
+    }
+
+    public function jackpotWin(Request $request): JsonResponse
+    {
+        logger()->channel('pragmatic')->info('Jackpot Win', $request->all());
+
+        /** @var Player $player */
+        $player = $this->pragmaticServiceInterface->getPlayerByUserId($request->input('userId'));
+
+        if (! $player) {
+            return response()->json([
+                'error' => PragmaticErrorCodesService::getPlayerNotFoundCode(),
+                'description' => 'Player not found',
+            ]);
+        }
+
+        $transaction = $this->pragmaticServiceInterface->processedJackpotWin($player, $request->all());
+
+        if (! $transaction) {
+            return response()->json([
+                'error' => PragmaticErrorCodesService::getInternalServerErrorRetryCode(),
+                'description' => 'Server error',
+            ]);
+        }
+
+        return $this->successResponse([
+            'transactionId' => $transaction->id,
+            'currency' => $player->currency,
+            'cash' => $player->balance,
+            'bonus' => $player->bonus,
+        ]);
+    }
+
+    public function endRound(Request $request): JsonResponse
+    {
+        logger()->channel('pragmatic')->info('End Round', $request->all());
+
+        /** @var Player $player */
+        $player = $this->pragmaticServiceInterface->getPlayerByUserId($request->input('userId'));
+
+        if (! $player) {
+            return response()->json([
+                'error' => PragmaticErrorCodesService::getPlayerNotFoundCode(),
+                'description' => 'Player not found',
+            ]);
+        }
+
+        $this->pragmaticServiceInterface->endRound($player, $request->all());
+
+        return $this->successResponse([
+            'cash' => $player->balance,
+            'bonus' => $player->bonus,
+        ]);
+    }
+
+    public function refund(Request $request): JsonResponse
+    {
+        logger()->channel('pragmatic')->info('Refund', $request->all());
+
+        /** @var Player $player */
+        $player = $this->pragmaticServiceInterface->getPlayerByUserId($request->input('userId'));
+
+        if (! $player) {
+            return response()->json([
+                'error' => PragmaticErrorCodesService::getPlayerNotFoundCode(),
+                'description' => 'Player not found',
+            ]);
+        }
+
+        $transaction = $this->pragmaticServiceInterface->refund($player, $request->all());
+
+        if (! $transaction) {
+            return response()->json([
+                'error' => PragmaticErrorCodesService::getInternalServerErrorRetryCode(),
+                'description' => 'Server error',
+            ]);
+        }
+
+        return $this->successResponse([
+            'transactionId' => $transaction->id,
+        ]);
+    }
+
+    public function promoWin(Request $request): JsonResponse
+    {
+        logger()->channel('pragmatic')->info('Promo win', $request->all());
+
+        /** @var Player $player */
+        $player = $this->pragmaticServiceInterface->getPlayerByUserId($request->input('userId'));
+
+        if (! $player) {
+            return response()->json([
+                'error' => PragmaticErrorCodesService::getPlayerNotFoundCode(),
+                'description' => 'Player not found',
+            ]);
+        }
+
+        $transaction = $this->pragmaticServiceInterface->promoWin($player, $request->all());
+
+        if (! $transaction) {
+            return response()->json([
+                'error' => PragmaticErrorCodesService::getInternalServerErrorRetryCode(),
+                'description' => 'Server error',
+            ]);
+        }
+
+        return $this->successResponse([
+            'transactionId' => $transaction->id,
+            'currency' => $player->currency,
+            'cash' => $player->balance,
+            'bonus' => $player->bonus,
+        ]);
+    }
+
+    public function sessionExpired(Request $request): JsonResponse
+    {
+        logger()->channel('pragmatic')->info('Session Expired', $request->all());
+
+        /** @var Player $player */
+        $player = $this->pragmaticServiceInterface->getPlayerByUserId($request->input('userId'));
+
+        if (! $player) {
+            return response()->json([
+                'error' => PragmaticErrorCodesService::getPlayerNotFoundCode(),
+                'description' => 'Player not found',
+            ]);
+        }
+
+        $this->pragmaticServiceInterface->sessionExpired($player, $request->all());
+
+        return $this->successResponse();
+    }
+
+    public function adjustment(Request $request): JsonResponse
+    {
+        logger()->channel('pragmatic')->info('Adjustment', $request->all());
+
+        /** @var Player $player */
+        $player = $this->pragmaticServiceInterface->getPlayerByUserId($request->input('userId'));
+
+        if (! $player) {
+            return response()->json([
+                'error' => PragmaticErrorCodesService::getPlayerNotFoundCode(),
+                'description' => 'Player not found',
+            ]);
+        }
+
+        $result = $this->pragmaticServiceInterface->adjustment($player, $request->all());
+
+        if (isset($result['negative_balance'])) {
+            return response()->json([
+                'error' => PragmaticErrorCodesService::getInsufficientBalanceCode(),
+                'description' => 'Insufficient balance',
+            ]);
+        }
+
+        if (! isset($result['transaction'])) {
+            return response()->json([
+                'error' => PragmaticErrorCodesService::getInternalServerErrorRetryCode(),
+                'description' => 'Server error',
+            ]);
+        }
+
+        $transaction = $result['transaction'];
+
+        return $this->successResponse([
+            'transactionId' => $transaction->id,
+            'currency' => $player->currency,
+            'cash' => $player->balance,
+            'bonus' => $player->bonus,
+        ]);
+    }
+
+    public function roundDetails(Request $request): JsonResponse
+    {
+        logger()->channel('pragmatic')->info('Round details', $request->all());
+
+        /** @var Player $player */
+        $player = $this->pragmaticServiceInterface->getPlayerByUserId($request->input('userId'));
+
+        if (! $player) {
+            return response()->json([
+                'error' => PragmaticErrorCodesService::getPlayerNotFoundCode(),
+                'description' => 'Player not found',
+            ]);
+        }
+
+        $this->pragmaticServiceInterface->roundDetails($player, $request->all());
+
+        return $this->successResponse();
     }
 
     private function successResponse(array $data = []): JsonResponse

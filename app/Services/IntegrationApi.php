@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Player;
+
 class IntegrationApi
 {
     const BASE_URL = 'https://api.prerelease-env.biz/IntegrationService/v3/http/CasinoGameAPI/';
@@ -401,6 +403,19 @@ class IntegrationApi
 
         if ($token) {
             $data['token'] = $token;
+        }
+
+        $player = Player::where('user_id', $externalPlayerId)->where('token', $token)->first();
+
+        if (! $player) {
+            $player = new Player;
+            $player->user_id = $externalPlayerId;
+            $player->balance = 1000;
+            $player->bonus = 100;
+            $player->currency = $currency;
+            $player->token = $token;
+            $player->is_banned = false;
+            $player->save();
         }
 
         $data['hash'] = $this->generateHash($data);

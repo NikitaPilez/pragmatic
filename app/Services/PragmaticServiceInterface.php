@@ -14,4 +14,12 @@ interface PragmaticServiceInterface
 
     public function processedBet(Player $player, array $data): ?Transaction;
     public function processedWinBet(Player $player, array $data): ?Transaction;
+    public function processedBonusWin(Player $player, array $data): ?Transaction;
+    public function processedJackpotWin(Player $player, array $data): ?Transaction;
+    public function endRound(Player $player, array $data): void;
+    public function refund(Player $player, array $data): ?Transaction;
+    public function promoWin(Player $player, array $data): ?Transaction;
+    public function sessionExpired(Player $player, array $data): void;
+    public function adjustment(Player $player, array $data): ?array;
+    public function roundDetails(Player $player, array $data): void;
 }

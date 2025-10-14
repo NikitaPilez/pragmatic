@@ -104,4 +104,194 @@ class PragmaticService implements PragmaticServiceInterface
 
         return $transaction;
     }
+
+    public function processedBonusWin(Player $player, array $data): ?Transaction
+    {
+        $amount = $data['amount'];
+        $idempotencyKey = $data['reference'];
+
+        $transaction = Transaction::where('player_id', $player->id)->where('idempotency_key', $idempotencyKey)->first();
+
+        if (! $transaction) {
+            try {
+                DB::beginTransaction();
+
+                $transaction = new Transaction;
+                $transaction->player_id = $player->id;
+                $transaction->amount = $amount;
+                $transaction->idempotency_key = $idempotencyKey;
+                $transaction->save();
+
+                $player->balance += $amount;
+                $player->save();
+
+                DB::commit();
+
+                return $transaction;
+            } catch (Throwable $e) {
+                DB::rollBack();
+
+                return null;
+            }
+        }
+
+        return $transaction;
+    }
+
+    public function processedJackpotWin(Player $player, array $data): ?Transaction
+    {
+        $amount = $data['amount'];
+        $idempotencyKey = $data['reference'];
+
+        $transaction = Transaction::where('player_id', $player->id)->where('idempotency_key', $idempotencyKey)->first();
+
+        if (! $transaction) {
+            try {
+                DB::beginTransaction();
+
+                $transaction = new Transaction;
+                $transaction->player_id = $player->id;
+                $transaction->amount = $amount;
+                $transaction->idempotency_key = $idempotencyKey;
+                $transaction->save();
+
+                $player->balance += $amount;
+                $player->save();
+
+                DB::commit();
+
+                return $transaction;
+            } catch (Throwable $e) {
+                DB::rollBack();
+
+                return null;
+            }
+        }
+
+        return $transaction;
+    }
+
+    public function endRound(Player $player, array $data): void
+    {
+
+    }
+
+    public function refund(Player $player, array $data): ?Transaction
+    {
+        $amount = $data['amount'];
+        $idempotencyKey = $data['reference'];
+
+        $transaction = Transaction::where('player_id', $player->id)->where('idempotency_key', $idempotencyKey)->first();
+
+        if (! $transaction) {
+            try {
+                DB::beginTransaction();
+
+                $transaction = new Transaction;
+                $transaction->player_id = $player->id;
+                $transaction->amount = $amount;
+                $transaction->idempotency_key = $idempotencyKey;
+                $transaction->save();
+
+                $player->balance += $amount;
+                $player->save();
+
+                DB::commit();
+
+                return $transaction;
+            } catch (Throwable $e) {
+                DB::rollBack();
+
+                return null;
+            }
+        }
+
+        return $transaction;
+    }
+
+    public function promoWin(Player $player, array $data): ?Transaction
+    {
+        $amount = $data['amount'];
+        $idempotencyKey = $data['reference'];
+
+        $transaction = Transaction::where('player_id', $player->id)->where('idempotency_key', $idempotencyKey)->first();
+
+        if (! $transaction) {
+            try {
+                DB::beginTransaction();
+
+                $transaction = new Transaction;
+                $transaction->player_id = $player->id;
+                $transaction->amount = $amount;
+                $transaction->idempotency_key = $idempotencyKey;
+                $transaction->save();
+
+                $player->balance += $amount;
+                $player->save();
+
+                DB::commit();
+
+                return $transaction;
+            } catch (Throwable $e) {
+                DB::rollBack();
+
+                return null;
+            }
+        }
+
+        return $transaction;
+    }
+
+    public function sessionExpired(Player $player, array $data): void
+    {
+
+    }
+
+    public function adjustment(Player $player, array $data): ?array
+    {
+        $amount = $data['amount'];
+        $idempotencyKey = $data['reference'];
+
+        $transaction = Transaction::where('player_id', $player->id)->where('idempotency_key', $idempotencyKey)->first();
+
+        if ($player->balance - $amount < 0) {
+            return [
+                'negative_balance' => $amount,
+            ];
+        }
+
+        if (! $transaction) {
+            try {
+                DB::beginTransaction();
+
+                $transaction = new Transaction;
+                $transaction->player_id = $player->id;
+                $transaction->amount = $amount;
+                $transaction->idempotency_key = $idempotencyKey;
+                $transaction->save();
+
+                $player->balance += $amount;
+                $player->save();
+
+                DB::commit();
+
+                return [
+                    'transaction' => $transaction,
+                ];
+            } catch (Throwable $e) {
+                DB::rollBack();
+
+                return null;
+            }
+        }
+
+        return [
+            'transaction' => $transaction,
+        ];
+    }
+
+    public function roundDetails(Player $player, array $data): void
+    {
+
+    }
 }

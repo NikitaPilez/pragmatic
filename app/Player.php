@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property float $balance
  * @property float $bonus
  * @property string $currency
+ * @property string $token
  * @property bool $is_banned
  */
 class Player extends Model
