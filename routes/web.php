@@ -22,3 +22,11 @@ Route::prefix('pragmatic-wallet')->group(function () {
     Route::post('adjustment.html', [PragmaticWalletController::class, 'adjustment']);
     Route::post('round-details.html', [PragmaticWalletController::class, 'roundDetails']);
 });
+
+Route::get('casino-games', 'PragmaticController@casinoGames');
+Route::get('lobby-games', 'PragmaticController@lobbyGames');
+Route::get('close-session', 'PragmaticController@closeSession');
+Route::get('cancel-round', 'PragmaticController@cancelRound');
+Route::get('health-check', 'PragmaticController@healthCheck');
+Route::get('replay-link', 'PragmaticController@replayLink');
+Route::get('game-url', 'PragmaticController@gameUrl');
