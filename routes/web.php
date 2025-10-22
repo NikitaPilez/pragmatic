@@ -3,10 +3,6 @@
 use App\Http\Controllers\PragmaticWalletController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    phpinfo();
-});
-
 Route::prefix('pragmatic-wallet')->group(function () {
     Route::post('authenticate.html', [PragmaticWalletController::class, 'authenticate']);
     Route::post('balance.html', [PragmaticWalletController::class, 'balance']);
