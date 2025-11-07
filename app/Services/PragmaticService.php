@@ -178,35 +178,41 @@ class PragmaticService implements PragmaticServiceInterface
 
     public function refund(Player $player, array $data): ?Transaction
     {
-        $amount = $data['amount'];
         $idempotencyKey = $data['reference'];
 
-        $transaction = Transaction::where('player_id', $player->id)->where('idempotency_key', $idempotencyKey)->first();
+        $originalTransaction = Transaction::where('player_id', $player->id)->where('idempotency_key', $idempotencyKey)->first();
 
-        if (! $transaction) {
-            try {
-                DB::beginTransaction();
-
-                $transaction = new Transaction;
-                $transaction->player_id = $player->id;
-                $transaction->amount = $amount;
-                $transaction->idempotency_key = $idempotencyKey;
-                $transaction->save();
-
-                $player->balance += $amount;
-                $player->save();
-
-                DB::commit();
-
-                return $transaction;
-            } catch (Throwable $e) {
-                DB::rollBack();
-
-                return null;
-            }
+        if (! $originalTransaction) {
+            return null;
         }
 
-        return $transaction;
+        $refundIdempotencyKey = 'refund_' . $idempotencyKey;
+        $refundTransaction = Transaction::where('player_id', $player->id)->where('idempotency_key', $refundIdempotencyKey)->first();
+
+        if ($refundTransaction) {
+            return null;
+        }
+
+        try {
+            DB::beginTransaction();
+
+            $transaction = new Transaction;
+            $transaction->player_id = $player->id;
+            $transaction->amount = -$originalTransaction->amount;
+            $transaction->idempotency_key = $refundIdempotencyKey;
+            $transaction->save();
+
+            $player->balance -= $originalTransaction->amount;
+            $player->save();
+
+            DB::commit();
+
+            return $transaction;
+        } catch (Throwable $e) {
+            DB::rollBack();
+
+            return null;
+        }
     }
 
     public function promoWin(Player $player, array $data): ?Transaction
