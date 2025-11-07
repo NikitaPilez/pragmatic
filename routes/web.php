@@ -8,15 +8,15 @@ Route::prefix('pragmatic-wallet')->group(function () {
     Route::post('balance.html', [PragmaticWalletController::class, 'balance']);
     Route::post('bet.html', [PragmaticWalletController::class, 'bet']);
     Route::post('result.html', [PragmaticWalletController::class, 'result']);
-    Route::post('bonus-win.html', [PragmaticWalletController::class, 'bonusWin']);
-    Route::post('jackpot-win.html', [PragmaticWalletController::class, 'jackpotWin']);
-    Route::post('end-round.html', [PragmaticWalletController::class, 'endRound']);
+    Route::post('bonusWin.html', [PragmaticWalletController::class, 'bonusWin']);
+    Route::post('jackpotWin.html', [PragmaticWalletController::class, 'jackpotWin']);
+    Route::post('endRound.html', [PragmaticWalletController::class, 'endRound']);
     Route::post('refund.html', [PragmaticWalletController::class, 'refund']);
-    Route::post('get-balance-per-game.html', [PragmaticWalletController::class, 'getBalancePerGame']);
-    Route::post('promo-win.html', [PragmaticWalletController::class, 'promoWin']);
-    Route::post('session-expired.html', [PragmaticWalletController::class, 'sessionExpired']);
+    Route::post('getBalancePerGame.html', [PragmaticWalletController::class, 'getBalancePerGame']);
+    Route::post('promoWin.html', [PragmaticWalletController::class, 'promoWin']);
+    Route::post('sessionExpired.html', [PragmaticWalletController::class, 'sessionExpired']);
     Route::post('adjustment.html', [PragmaticWalletController::class, 'adjustment']);
-    Route::post('round-details.html', [PragmaticWalletController::class, 'roundDetails']);
+    Route::post('roundDetails.html', [PragmaticWalletController::class, 'roundDetails']);
 });
 
 Route::get('casino-games', 'PragmaticController@casinoGames');
